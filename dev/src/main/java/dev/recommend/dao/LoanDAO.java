@@ -97,8 +97,31 @@ public class LoanDAO implements LoanProductService {
 
 
 	@Override
-	public LoanProductDto findById(long arg0) {
-		// TODO Auto-generated method stub
+	public LoanProductDto findById(long id) {
+
+		String selectQuery = "SELECT * " + "FROM loan_product " + "WHERE id = ? ";
+
+		try (Connection connection = DBUtil.getConnection();
+				PreparedStatement statement = connection.prepareStatement(selectQuery);) {
+
+			statement.setLong(1, id);
+
+			ResultSet resultSet = statement.executeQuery();
+
+			resultSet.next();
+
+			long loan_product = resultSet.getLong("id");
+			String name = resultSet.getString("name");
+			int loan_limit = resultSet.getInt("loan_limit");
+			float interest_rate = resultSet.getFloat("interest_rate");
+			String credit_grade_id = resultSet.getString("credit_grade_id");
+
+			return new LoanProductDto(loan_product, name, loan_limit, interest_rate, credit_grade_id);
+
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+
 		return null;
 	}
 
@@ -167,8 +190,46 @@ public class LoanDAO implements LoanProductService {
 
 
 	@Override
-	public void updateLoanProduct(long arg0, String arg1, int arg2, float arg3, String arg4) {
-		// TODO Auto-generated method stub
-		
+	public void updateLoanProduct(long id, String name, int loanLimit, float interestRate, String minimumCreditGrade) {
+		String updateQuery = "UPDATE loan_product "
+				+ "SET name = ?, loan_limit = ?, interest_rate = ? , credit_grade_id = ? " + "WHERE id = ? ";
+
+		long credit_grade_id = 0L;
+
+		switch (minimumCreditGrade) {
+		case "A":
+			credit_grade_id = 1L;
+			break;
+		case "B":
+			credit_grade_id = 2L;
+			break;
+		case "C":
+			credit_grade_id = 3L;
+			break;
+		case "D":
+			credit_grade_id = 4L;
+			break;
+		case "E":
+			credit_grade_id = 5L;
+			break;
+		default:
+			break;
+		}
+
+		try (Connection connection = DBUtil.getConnection();
+				PreparedStatement statement = connection.prepareStatement(updateQuery);) {
+
+			statement.setString(1, name);
+			statement.setInt(2, loanLimit);
+			statement.setFloat(3, interestRate);
+			statement.setLong(4, credit_grade_id);
+			statement.setLong(5, id);
+
+			statement.executeUpdate();
+
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+
 	}
 }

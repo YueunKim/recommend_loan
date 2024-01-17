@@ -28,5 +28,6 @@ public class LoanController {
 			LoanDAO loanDAO = new LoanDAO();
 			System.out.println(loanDAO.recommend("A",10));
 
-		}
+		}		
+		
 }
